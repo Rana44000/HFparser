@@ -7,7 +7,11 @@ Searches for the large values using the HF cutoff. The default cutoff value is 8
 
 Finds the atoms of the large values and outputs the atom numbers and hyperfine tensor values into new file HFvalues.txt.
 
-Additionally, can print out isotropic hyperfine values if user chooses into HFisoAll.txt and HFisoLarge.txt
+Additionally:
+
+can find all HF values and averages for a user defined atom using -md and atom number
+
+can print out isotropic hyperfine values if user chooses into HFisoAll.txt and HFisoLarge.txt using -iso and True
 
 Input files: OUTCAR
 
