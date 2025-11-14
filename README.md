@@ -1,6 +1,12 @@
 # HFparser
 Code to find and output large hyperfine values from OUTCAR file.
 
+The OUTCAR file is from running the VASP program.
+
+For more information on OUTCAR, see: https://www.vasp.at/wiki/index.php/OUTCAR
+
+For more information on VASP, see: https://www.vasp.at/wiki/index.php/The_VASP_Manual
+
 reads OUTCAR file for hyperfine tensor values. 
 
 Searches for the large values using the HF cutoff. The default cutoff value is 8. The user can change this. 
