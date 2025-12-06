@@ -17,6 +17,8 @@ Additionally:
 
 can find all HF values and averages for a user defined atom using -md and atom number
 
+can print out dipolar matrix values and large isotropic hyperfine values using -matrix and True
+
 can print out isotropic hyperfine values if user chooses into HFisoAll.txt and HFisoLarge.txt using -iso and True
 
 Input files: OUTCAR
