@@ -1,5 +1,5 @@
 #input files: OUTCAR file
-#output files: HFvalues.txt, if chosen: HFisoAll.txt, HFisoLarge.txt, HFmatrix.txt
+#output files: HFvalues.txt, if chosen: HFisoAll.txt, HFisoLarge.txt
 #This code is to find and print the coordinates of the large Hyperfine values. 
 import argparse
 import os
@@ -155,12 +155,12 @@ num=0
 count4=0
 compare=config['hfcutoff']
 
-if config['md']==0 and config['matrix']==False:
+if config['md']==0 or config['matrix']==True:
     print("Running code to calculate HF values")
     #Reads OUTCAR file and outputs coupling parameters into new file HFcouplingAll.txt
     print("Input files are: OUTCAR")
     ISiso=config['iso']
-    if ISiso==True:
+    if ISiso==True or config['matrix']==True:
         #Reads OUTCAR file and outputs Fermi contact (isotropic) hyperfine coupling parameter (MHz) into new file; HFisoAll.txt
         with open(config["outcar"], 'r') as f:
              for line in f:
@@ -189,6 +189,7 @@ if config['md']==0 and config['matrix']==False:
         #compare=float(input("HF input: "))
         with open("HFisoAll.txt", 'r') as t:
              with open("HFisoLarge.txt", "w") as x:
+                print( "Atom #    A1c   Atotal    A1c+Atotal", file=x)
                 for i, line in enumerate(t):
                     count2 = count2 + 1
                     if '-------------------------------------------------------------' in line and count2>2:
@@ -197,7 +198,8 @@ if config['md']==0 and config['matrix']==False:
                            temp = line.split()
                            floatTemp=[float(i) for i in temp[1:]]
                            if floatTemp[4]>=compare or floatTemp[4]<=-compare:
-                              print(temp[0], floatTemp[4], file=x)
+                              Atotal=floatTemp[3]+floatTemp[4]
+                              print(temp[0],"  ", floatTemp[3], "  ",floatTemp[4], "  ",Atotal, file=x)
                         
         print("Output files are: HFisoAll.txt, HFisoLarge.txt")
     #reads outcar for Total hyperfine coupling parameters after diagonalization (MHz) and outputs into HFcouplingAll.txt
@@ -221,7 +223,7 @@ if config['md']==0 and config['matrix']==False:
                              line = skip_ahead(f, 4)
                              always_print=True
                              num=0
-                     if num2==count4:
+                     if num2>count4:
                          print("no hyperfine coupling found in OUTCAR")
                  if always_print:
                     with open("HFcouplingAll.txt", "a") as y:
