@@ -1,6 +1,6 @@
 #input files: OUTCAR file
 #output files: HFvalues.txt, if chosen: HFisoAll.txt, HFisoLarge.txt
-#This code is to find and print the coordinates of the large Hyperfine values. 
+#This code is to find and print large Hyperfine values. 
 import argparse
 import os
 
@@ -248,3 +248,4 @@ if config['md']==0 or config['matrix']==True:
     #removes HFcouplingAll.txt file
     if config['matrix']==False and config['iso']==False:
        print("Output files: HFvalues.txt")
+
