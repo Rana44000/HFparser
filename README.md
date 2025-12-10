@@ -23,19 +23,10 @@ can print out isotropic hyperfine values if user chooses into HFisoAll.txt and H
 
 Input files: OUTCAR
 
-Output files: HFvalues.txt, HFisoAll.txt, HFisoLarge.txt
+Output files: HFvalues.txt, HFisoAll.txt, HFisoLarge.txt, HFmatrix.txt
 
-Sample output in HFvalues.txt with SiH3:
-
-
-HF_Large coordinates
-
-Atom  Axx       Ayy       Azz
-
-1.0   362.917   362.833   621.1
-
-2.0   -23.614   -10.418   -28.168
-
-3.0   -23.051   -9.906   -27.658
-
-4.0   -23.877   -10.821   -28.479
+Sample output in HFvalues.txt with SiH3 OUTCAR file:
+default: HFvalues(md=0).txt
+-iso True: HFvalues(md=0).txt, HFisoAll.txt, HFisoLarge.txt
+-matrix True: HFvalues(md=0).txt, HFisoAll.txt, HFisoLarge.txt, HFmatrix.txt
+-md 1: HFvalues(md=1).txt
