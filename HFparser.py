@@ -1,6 +1,6 @@
 #input files: OUTCAR file
 #output files: HFvalues.txt, if chosen: HFisoAll.txt, HFisoLarge.txt
-#This code is to find and print large Hyperfine values. 
+#This code is to find and print the large Hyperfine values. 
 import argparse
 import os
 
@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser(description="Arguments for vasp output file ",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-outcar", nargs='?', default = "./OUTCAR", help="outcar file location")
 parser.add_argument("-hfcutoff", nargs='?', type=float, default = 8.0, help="cuttoff HF value")
-parser.add_argument("-iso", nargs='?', type=bool, default = False, help="output HFisoAll.txt and HFisoLarge.txt")
+parser.add_argument("-iso", nargs='?', type=bool, default = True, help="output HFisoAll.txt and HFisoLarge.txt")
 parser.add_argument("-md", nargs='?', type=float, default=0, help="atom number for HF values to output HF values of this atom")
 parser.add_argument("-matrix", nargs='?', type=bool, default=False, help="read the dipolar matrix elements")
 
@@ -56,7 +56,7 @@ if config['md']!=0:
     totalY=0
     totalZ=0
     with open("HFvalues.txt", 'w') as z:
-         print("HF coordinates (MHz) of atom #", config['md'],file=z)
+         print("HF values (MHz) of atom #", config['md'],file=z)
          print("Axx       Ayy       Azz", file=z)
     with open("HFcouplingAll.txt", 'r') as x:
          for line in x:
@@ -171,7 +171,7 @@ if config['md']==0 or config['matrix']==True:
                      if count3==1:
                         always_print=False
         with open("HFmatrix.txt", 'w') as z:
-            print("HF_Large matrix coordinates (MHz)", file=z)
+            print("HF_Large matrix values (MHz)", file=z)
             print("Atom  Axx     Ayy     Azz    Axy    Axz   Ayz", file=z)
         with open("HFisoLarge.txt", 'r') as y:
             lines_y = y.readlines()
@@ -193,11 +193,14 @@ if config['md']==0 or config['matrix']==True:
                     with open("HFmatrix.txt", 'a') as z:
                          print(int(compx[0]), ' ', f"{float(compx[1]):.2f}" ,' ', f"{float(compx[2]):.2f}",' ',f"{float(compx[3]):.2f}", ' ', f"{float(compx[4]):.2f}",' ', f"{float(compx[5]):.2f}",' ',f"{float(compx[6]):.2f}", file=z)
                          #print(' '.join(compx[:7]), file=z)
-        print("Output files: HFisoAll.txt, HFisoLarge.txt, HFmatrix.txt, HFvalues.txt")
-    os.remove("HFdipolarAll.txt")
-    #removes HFdipolarAll.txt file
-    if (config["matrix"])==False:
+        os.remove("HFdipolarAll.txt")
+        #removes HFdipolarAll.txt file
+        if config["matrix"]==True and config["iso"]==False:
+           print("Output files: HFisoAll.txt, HFisoLarge.txt, HFmatrix.txt, HFvalues.txt")
+    
+    if (config["matrix"])==False and config["iso"]==True:
         print("Output files are: HFisoAll.txt, HFisoLarge.txt, HFvalues.txt")
+        os.remove("HFmatrix.txt")
     #reads outcar for Total hyperfine coupling parameters after diagonalization (MHz) and outputs into HFcouplingAll.txt
     num=0
     count4=0
@@ -230,7 +233,7 @@ if config['md']==0 or config['matrix']==True:
     count4=0
     count2=0
     with open("HFvalues.txt", 'w') as z:
-         print("HF_Large coordinates (MHz)", file=z)
+         print("HF Values (MHz)", file=z)
          print("Atom  Axx       Ayy       Azz", file=z)
     with open("HFcouplingAll.txt", 'r') as x:
          for line in x:
@@ -248,4 +251,3 @@ if config['md']==0 or config['matrix']==True:
     #removes HFcouplingAll.txt file
     if config['matrix']==False and config['iso']==False:
        print("Output files: HFvalues.txt")
-
