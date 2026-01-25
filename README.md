@@ -3,7 +3,7 @@ Code to find and output large hyperfine values from OUTCAR file.
 
 # Command Line Arguments
 | Argument | Type | Default | Description |
-| ---------- | ---------- | ---------- |
+| :------: | :---: | :----: | :---------: |
 | -outcar |  | ./OUTCAR | outcar file location |
 | -hfcutoff | float | 8.0 | cuttoff HF value |
 | -iso | bool | False | output isotropic hyperfine values into HFisoAll.txt and HFisoLarge.txt |
