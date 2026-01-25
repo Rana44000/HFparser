@@ -5,7 +5,7 @@ Code to find and output large hyperfine values from OUTCAR file.
 | Argument | Type | Default | Description |
 | :------: | :---: | :----: | :---------: |
 | -outcar |  | ./OUTCAR | outcar file location |
-| -hfcutoff | float | 8.0 | cuttoff HF value |
+| -hfcutoff | float | 8.0 | HF cuttoff value |
 | -iso | bool | False | output isotropic hyperfine values into HFisoAll.txt and HFisoLarge.txt |
 | -md | float | 0 | atom number for HF values to output HF values and averages of this atom |
 | -matrix | bool | False | read the dipolar matrix elements |
