@@ -1,10 +1,19 @@
 # HFparser
 Code to find and output large hyperfine values from OUTCAR file.
 
+# Command Line Arguments
+| Argument | Type | Default | Description |
+| ---------- | ---------- | ---------- |
+| -outcar |  | ./OUTCAR | outcar file location |
+| -hfcutoff | float | 8.0 | cuttoff HF value |
+| -iso | bool | False | output isotropic hyperfine values into HFisoAll.txt and HFisoLarge.txt |
+| -md | float | 0 | atom number for HF values to output HF values and averages of this atom |
+| -matrix | bool | False | read the dipolar matrix elements |
+
 # Features
-- find all HF values and averages for a user defined atom ( -md and atom number
-- print out dipolar matrix values and large isotropic hyperfine values using -matrix and True as well as default HFvalues
-- print out isotropic hyperfine values if user chooses into HFisoAll.txt and HFisoLarge.txt using -iso and True
+- find all HF values and averages for a user defined atom
+- print out dipolar matrix values and large isotropic hyperfine values as well as default HFvalues
+- print out isotropic hyperfine values if user chooses into HFisoAll.txt and HFisoLarge.txt
 
 
 The OUTCAR file is from running the VASP program.
