@@ -2,7 +2,9 @@
 Code to find and output large hyperfine values from OUTCAR file.
 
 # Features
-
+- find all HF values and averages for a user defined atom ( -md and atom number
+- print out dipolar matrix values and large isotropic hyperfine values using -matrix and True as well as default HFvalues
+- print out isotropic hyperfine values if user chooses into HFisoAll.txt and HFisoLarge.txt using -iso and True
 
 
 The OUTCAR file is from running the VASP program.
@@ -17,13 +19,6 @@ Searches for the large values using the HF cutoff. The default cutoff value is 8
 
 Finds the atoms of the large values and outputs the atom numbers and hyperfine tensor values into new file HFvalues.txt.
 
-Additionally:
-
-can find all HF values and averages for a user defined atom using -md and atom number
-
-can print out dipolar matrix values and large isotropic hyperfine values using -matrix and True as well as default HFvalues
-
-can print out isotropic hyperfine values if user chooses into HFisoAll.txt and HFisoLarge.txt using -iso and True
 
 Input files: OUTCAR
 
