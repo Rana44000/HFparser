@@ -10,6 +10,7 @@
 | -iso | bool | True | output isotropic hyperfine values into HFisoAll.txt and HFisoLarge.txt |
 | -md | int | 0 | to output HF values and averages for this atom #, 0 for no output generated |
 | -matrix | bool | True | read the dipolar matrix elements |
+| -core | bool | True | parses the core correction HF value |
 
 ## Features
 - Find large hyperfine tensor values
