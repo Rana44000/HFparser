@@ -8,7 +8,7 @@
 | -o |  | ./OUTCAR | outcar file location and name |
 | -c | float | 8.0 | hyperfine cutoff value |
 | -iso | bool | True | output isotropic hyperfine values into HFisoAll.txt and HFisoLarge.txt |
-| -md | float | 0 | atom number for HF values to output HF values and averages of this atom |
+| -md | float | 0 | to output HF values and averages for this atom #, 0 for no output generated |
 | -m | bool | True | read the dipolar matrix elements |
 
 ## Features
