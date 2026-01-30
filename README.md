@@ -6,7 +6,7 @@
 | Argument | Type | Default | Description |
 | :------: | :---: | :----: | :---------: |
 | -o |  | ./OUTCAR | outcar file location and name |
-| -c | float | 8.0 | HF cuttoff value |
+| -c | float | 8.0 | hyperfine cutoff value |
 | -iso | bool | False | output isotropic hyperfine values into HFisoAll.txt and HFisoLarge.txt |
 | -md | float | 0 | atom number for HF values to output HF values and averages of this atom |
 | -matrix | bool | False | read the dipolar matrix elements |
