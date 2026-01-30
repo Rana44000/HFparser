@@ -5,7 +5,7 @@
 ## Command Line Arguments
 | Argument | Type | Default | Description |
 | :------: | :---: | :----: | :---------: |
-| -outcar |  | ./OUTCAR | outcar file location |
+| -o |  | ./OUTCAR | outcar file location and name |
 | -hfcutoff | float | 8.0 | HF cuttoff value |
 | -iso | bool | False | output isotropic hyperfine values into HFisoAll.txt and HFisoLarge.txt |
 | -md | float | 0 | atom number for HF values to output HF values and averages of this atom |
