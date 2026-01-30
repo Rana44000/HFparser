@@ -1,6 +1,6 @@
 # HFparser
 ## Overview
-  Code to find and output large hyperfine values from OUTCAR file. It reads OUTCAR file for hyperfine tensor values and searches for the large values using the HF cutoff. The default cutoff value is 8. The user can change this. It finds the atoms of the large values and outputs the atom numbers and hyperfine tensor values into new file HFvalues.txt. Additionally, it can find and output all HF values and averages for a single user defined atom, output isotropic hyperfine values, and read dipolar matrix elements. These command line arguments are detailed below. 
+  Code to find and output large hyperfine values from OUTCAR file from a VASP simulation. It reads OUTCAR file and searches for hyperfine tensor values. It can find the hyperfine values for select atoms of interest. The code can print out the isotropic parameter, the hyperfine matrix elements, and the core corrections. The code can print output for the final results of the relaxation or follow the results during a molecular dynamic simulation. Several command line arguments are availble for the user to select the desired output. 
 
 ## Command Line Arguments
 | Argument | Type | Default | Description |
