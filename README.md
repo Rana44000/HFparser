@@ -35,7 +35,7 @@ For more information on VASP, see: https://www.vasp.at/wiki/index.php/The_VASP_M
 - HFisoLarge.txt
 - HFmatrix.txt
 
-## Sample output in HFvalues.txt with SiH3 OUTCAR file:
+## Sample output in HFvalues.txt with CH3 OUTCAR file:
 - HFvalues(md=0).txt
 - iso True: HFvalues(md=0).txt, HFisoAll.txt, HFisoLarge.txt
 - matrix True: HFvalues(md=0).txt, HFisoAll.txt, HFisoLarge.txt, HFmatrix.txt
