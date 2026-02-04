@@ -6,11 +6,11 @@ import os
 
 parser = argparse.ArgumentParser(description="Arguments for vasp output file ",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("-outcar", nargs='?', default = "./OUTCAR", help="outcar file location")
-parser.add_argument("-hfcutoff", nargs='?', type=float, default = 8.0, help="cuttoff HF value")
-parser.add_argument("-iso", nargs='?', type=bool, default = False, help="output HFisoAll.txt and HFisoLarge.txt")
+parser.add_argument("-o", nargs='?', default = "./OUTCAR", help="outcar file location")
+parser.add_argument("-cut", nargs='?', type=float, default = 8.0, help="cuttoff HF value")
+parser.add_argument("-iso", nargs='?', type=bool, default = True, help="output HFisoAll.txt and HFisoLarge.txt")
 parser.add_argument("-md", nargs='?', type=float, default=0, help="atom number for HF values to output HF values of this atom")
-parser.add_argument("-matrix", nargs='?', type=bool, default=False, help="read the dipolar matrix elements")
+parser.add_argument("-matrix", nargs='?', type=bool, default=True, help="read the dipolar matrix elements")
 
 args = parser.parse_args()
 config = vars(args)
@@ -27,14 +27,14 @@ if config['md']!=0:
     count4=0
     count3=0
     num2=5
-    with open(config["outcar"], 'r') as f:
+    with open(config["o"], 'r') as f:
              for line in f:
                   if 'Total hyperfine coupling parameters after diagonalization (MHz)' in line:
                      count4=count4+1
              always_print=False
     with open("HFcouplingAll.txt", "w") as y:
          print ('Total hyperfine coupling parameters', file=y, end='')
-    with open(config["outcar"], 'r') as f:
+    with open(config["o"], 'r') as f:
              for line in f:
                  if 'Total hyperfine coupling parameters after diagonalization (MHz)' in line:
                      with open("HFcouplingAll.txt", "a") as y:
@@ -96,7 +96,7 @@ count2=0
 count3=0
 num=0
 count4=0
-compare=config['hfcutoff']
+compare=config['cut']
 
 if config['md']==0 or config['matrix']==True:
     print("Running code to calculate HF values")
@@ -105,11 +105,11 @@ if config['md']==0 or config['matrix']==True:
     ISiso=config['iso']
     if ISiso==True or config['matrix']==True:
         #Reads OUTCAR file and outputs Fermi contact (isotropic) hyperfine coupling parameter (MHz) into new file; HFisoAll.txt
-        with open(config["outcar"], 'r') as f:
+        with open(config["o"], 'r') as f:
              for line in f:
                  if 'Fermi contact (isotropic) hyperfine coupling parameter (MHz)' in line:
                     count4=count4+1
-        with open(config["outcar"], 'r') as f:
+        with open(config["o"], 'r') as f:
                  always_print=False
                  for line in f:
                      if 'Fermi contact (isotropic) hyperfine coupling parameter (MHz)' in line:
@@ -147,12 +147,12 @@ if config['md']==0 or config['matrix']==True:
         count4=0
         count3=0
         num2=5
-        with open(config["outcar"], 'r') as f:
+        with open(config["o"], 'r') as f:
                  for line in f:
                       if 'Total hyperfine coupling parameters after diagonalization (MHz)' in line:
                          count4=count4+1
                  always_print=False            
-        with open(config["outcar"], 'r') as f:
+        with open(config["o"], 'r') as f:
                  for line in f:
                      if ' Dipolar hyperfine coupling parameters (MHz)' in line:
                          num=num+1
@@ -208,12 +208,12 @@ if config['md']==0 or config['matrix']==True:
     count4=0
     count3=0
     num2=5
-    with open(config["outcar"], 'r') as f:
+    with open(config["o"], 'r') as f:
              for line in f:
                   if 'Total hyperfine coupling parameters after diagonalization (MHz)' in line:
                      count4=count4+1
              always_print=False
-    with open(config["outcar"], 'r') as f:
+    with open(config["o"], 'r') as f:
              for line in f:
                  if 'Total hyperfine coupling parameters after diagonalization (MHz)' in line:
                      num=num+1
