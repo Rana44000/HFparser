@@ -172,7 +172,7 @@ if config['md']==0 or config['matrix']==True:
                         always_print=False
         with open("HFmatrix.txt", 'w') as z:
             print("HF_Large matrix values (MHz)", file=z)
-            print("Atom  Axx     Ayy     Azz    Axy    Axz   Ayz", file=z)
+            print("Atom  Axx     Ayy     Azz    Axy    Axz   Ayz       Atot        Atot+A1c", file=z)
         with open("HFisoLarge.txt", 'r') as y:
             lines_y = y.readlines()
         values_y = []
@@ -182,16 +182,20 @@ if config['md']==0 or config['matrix']==True:
                 break
             compy = line.split()
             values_y.append(compy[0])
-        with open("HFdipolarAll.txt", 'r') as x:
+        with open("HFdipolarAll.txt", 'r') as x, open ("HFisoLarge.txt", 'r') as b:
             count5=0
-            for line in x:
+            count6=0
+            for line_x, line_b in zip(x, b):
                 count5 += 1
                 if '-------------------------------------------------------------' in line and count4 > 5:
                     break
-                compx = line.split()
-                if compx and compx[0] in values_y:
-                    with open("HFmatrix.txt", 'a') as z:
-                         print(int(compx[0]), ' ', f"{float(compx[1]):.2f}" ,' ', f"{float(compx[2]):.2f}",' ',f"{float(compx[3]):.2f}", ' ', f"{float(compx[4]):.2f}",' ', f"{float(compx[5]):.2f}",' ',f"{float(compx[6]):.2f}", file=z)
+                compx = line_x.split()
+                count6+=1
+                if "Atom" not in line_b:
+                    compb=line_b.split()
+                    if compx and compx[0] in values_y:
+                       with open("HFmatrix.txt", 'a') as z:
+                            print(int(compx[0]), ' ', f"{float(compx[1]):.2f}" ,' ', f"{float(compx[2]):.2f}",' ',f"{float(compx[3]):.2f}", ' ', f"{float(compx[4]):.2f}",' ', f"{float(compx[5]):.2f}",' ',f"{float(compx[6]):.2f}",'     ',f"{float(compb[2]):.2f}", '    ',f"{float(compb[3]):.2f}", file=z)
                         
         os.remove("HFdipolarAll.txt")
         #removes HFdipolarAll.txt file
