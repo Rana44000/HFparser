@@ -56,7 +56,7 @@ if config['md']!=0:
     totalY=0
     totalZ=0
     with open("HFvalues.txt", 'w') as z:
-         print("HF values (MHz) of atom #", int(config['md']),file=z)
+         print("HF values (MHz) of atom #", int(config['md']),"  (no core correction)", file=z)
          print("Axx       Ayy       Azz", file=z)
     with open("HFcouplingAll.txt", 'r') as x:
          for line in x:
@@ -172,7 +172,7 @@ if config['md']==0 or config['matrix']==True:
                         always_print=False
         with open("HFmatrix.txt", 'w') as z:
             print("HF_Large matrix values (MHz)", file=z)
-            print("Atom  Axx     Ayy     Azz    Axy    Axz   Ayz       Atot        Atot+A1c", file=z)
+            print("Atom  Axx     Ayy     Azz    Axy    Axz   Ayz       a_iso        a_iso with core corr", file=z)
         with open("HFisoLarge.txt", 'r') as y:
             lines_y = y.readlines()
         values_y = []
@@ -257,4 +257,5 @@ if config['md']==0 or config['matrix']==True:
     #removes HFcouplingAll.txt file
     if config['matrix']==False and config['iso']==False:
        print("Output files: HFvalues.txt")
+
 
