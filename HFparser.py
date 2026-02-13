@@ -239,7 +239,7 @@ if config['md']==0 or config['matrix']==True:
     count4=0
     count2=0
     with open("HFvalues.txt", 'w') as z:
-         print("HF Values (MHz)", file=z)
+         print("HF Values (MHz) (no core correction", file=z)
          print("Atom  Axx       Ayy       Azz", file=z)
     with open("HFcouplingAll.txt", 'r') as x:
          for line in x:
@@ -257,3 +257,4 @@ if config['md']==0 or config['matrix']==True:
     #removes HFcouplingAll.txt file
     if config['matrix']==False and config['iso']==False:
        print("Output files: HFvalues.txt")
+
