@@ -30,7 +30,7 @@ For more information on VASP, see: https://www.vasp.at/wiki/index.php/The_VASP_M
 - OUTCAR
 
 ## Output files: 
-- HFvalues.txt
+- HFvalues.txt (no core correction)
 - HFisoAll.txt
 - HFisoLarge.txt
 - HFmatrix.txt
