@@ -6,7 +6,7 @@ import os
 
 parser = argparse.ArgumentParser(description="Arguments for vasp output file ",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("-o", nargs='?', default = "./OUTCAR", help="outcar file location")
+parser.add_argument("-o", nargs='?',const="./OUTCAR", default = "./OUTCAR", help="outcar file location")
 parser.add_argument("-cut", nargs='?', type=float, default = 8.0, help="cuttoff HF value")
 parser.add_argument("-iso", nargs='?', type=bool, default = True, help="output HFisoAll.txt and HFisoLarge.txt")
 parser.add_argument("-md", nargs='?', type=float, default=0, help="atom number for HF values to output HF values of this atom")
@@ -173,30 +173,31 @@ if config['md']==0 or config['matrix']==True:
         with open("HFmatrix.txt", 'w') as z:
             print("HF_Large matrix values (MHz)", file=z)
             print("Atom  Axx     Ayy     Azz    Axy    Axz   Ayz       a_iso        a_iso with core corr", file=z)
-        with open("HFisoLarge.txt", 'r') as y:
-            lines_y = y.readlines()
-        values_y = []
-        for line in lines_y:
-            count2 += 1
-            if '-------------------------------------------------------------' in line and count2 > 3:
-                break
-            compy = line.split()
-            values_y.append(compy[0])
-        with open("HFdipolarAll.txt", 'r') as x, open ("HFisoLarge.txt", 'r') as b:
-            count5=0
-            count6=0
-            for line_x, line_b in zip(x, b):
-                count5 += 1
-                if '-------------------------------------------------------------' in line and count4 > 5:
-                    break
-                compx = line_x.split()
-                count6+=1
-                if "Atom" not in line_b:
-                    compb=line_b.split()
-                    if compx and compx[0] in values_y:
-                       with open("HFmatrix.txt", 'a') as z:
-                            print(int(compx[0]), ' ', f"{float(compx[1]):.2f}" ,' ', f"{float(compx[2]):.2f}",' ',f"{float(compx[3]):.2f}", ' ', f"{float(compx[4]):.2f}",' ', f"{float(compx[5]):.2f}",' ',f"{float(compx[6]):.2f}",'     ',f"{float(compb[2]):.2f}", '    ',f"{float(compb[3]):.2f}", file=z)
-                        
+        iso = {}
+        with open("HFisoLarge.txt") as f:
+            for line in f:
+                if "Atom" in line:
+                    continue
+                parts = line.split()
+                if parts:
+                    atom = parts[0]
+                    iso[atom] = parts
+        
+        with open("HFdipolarAll.txt") as f, open("HFmatrix.txt", "a") as out:
+            for line in f:
+                parts = line.split()
+                if not parts:
+                    continue
+        
+                atom = parts[0]
+                if atom in iso:
+                    iso_parts = iso[atom]
+                    print(
+                        atom,"  ", f"{float(parts[1]):.2f}", "   ",f"{float(parts[2]):.2f}","     ", f"{float(parts[3]):.2f}", "     ", f"{float(parts[4]):.2f}","       ", f"{float(parts[5]):.2f}","       ", f"{float(parts[6]):.2f}", "      ", f"{float(iso_parts[2]):.2f}", "       ", f"{float(iso_parts[3]):.2f}",
+                        file=out
+                    )
+
+           
         os.remove("HFdipolarAll.txt")
         #removes HFdipolarAll.txt file
         if config["matrix"]==True and config["iso"]==False:
@@ -257,5 +258,4 @@ if config['md']==0 or config['matrix']==True:
     #removes HFcouplingAll.txt file
     if config['matrix']==False and config['iso']==False:
        print("Output files: HFvalues.txt")
-
 
