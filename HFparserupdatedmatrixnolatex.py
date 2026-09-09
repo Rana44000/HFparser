@@ -265,13 +265,13 @@ if config['md']==0 or config['matrix']==True:
     dipolar_count = 0
     count3 = 0
     
-    # Count dipolar blocks
+    #count dipolar
     with open(config["o"], 'r') as f:
         for line in f:
             if 'Dipolar hyperfine coupling parameters (MHz)' in line:
                 dipolar_count += 1
     
-    # Extract the last dipolar block
+    #get last dipolar
     with open(config["o"], 'r') as f:
         always_print = False
         for line in f:
