@@ -9,7 +9,7 @@
 | -cut | float | 8.0 | hyperfine cutoff value |
 | -iso | bool | True | output isotropic hyperfine values into HFisoAll.txt and HFisoLarge.txt |
 | -md | int | 0 | to output HF values and averages for this atom #, 0 for no output generated |
-| -matrix | bool | True | read the dipolar matrix elements |
+| -matrix | bool | True | read the dipolar matrix elements and calculates eigenvalues |
 | -core | bool | True | parses the core correction HF value |
 
 ## Features
