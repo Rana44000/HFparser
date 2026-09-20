@@ -265,185 +265,226 @@ if config['md']==0 or config['matrix']==True:
 #matrix wit h the eigenvalue stuff
 import csv
 import numpy as np
+import pandas as pd
+import os
 
+element_symbols = []
+element_counts = []
 
-if config['md']==0 or config['matrix']==True:
-    num = 0
-    dipolar_count = 0
-    count3 = 0
-    
-    #count dipolar
-    with open(config["o"], 'r') as f:
-        for line in f:
-            if 'Dipolar hyperfine coupling parameters (MHz)' in line:
-                dipolar_count += 1
-    
-    #get last dipolar
-    with open(config["o"], 'r') as f:
-        always_print = False
-        for line in f:
-            if 'Dipolar hyperfine coupling parameters (MHz)' in line:
-                num += 1
-                if num == dipolar_count:
-                    with open("HFdipolarAll.txt", "w") as y:
-                        print(line, file=y, end='')
-                        line = skip_ahead(f, 4)
-                        always_print = True
-    
-            if always_print:
-                with open("HFdipolarAll.txt", "a") as y:
-                    print(line, file=y, end='')
-                if '-------------------------------------------------------------' in line:
-                    count3 += 1
-            if count3 == 1:
-                always_print = False
-                count3 = 0
+with open(config["o"], 'r') as f:
+    for line in f:
+        if "POTCAR:" in line:
+            parts = line.split()
+            for p in parts:
+                if p.isalpha() and len(p) <= 2:
+                    element_symbols.append(p)
+                    break
+        if "ions per type" in line:
+            nums = line.replace("=", " ").split()
+            for n in nums:
+                if n.isdigit():
+                    element_counts.append(int(n))
 
-    with open("HFmatrix.csv", "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([
-            "Atom",
-            "Axx", "Ayy", "Azz",
-            "Axy", "Axz", "Ayz",
-            "Eigenvalue1", "Theta1", "Phi1",
-            "Eigenvalue2", "Theta2", "Phi2",
-            "Eigenvalue3", "Theta3", "Phi3",
-            "aiso", "acc"
-        ])
+atom_elements = []
+for symbol, count in zip(element_symbols, element_counts):
+    atom_elements.extend([symbol] * count)
+A1c_map = {}
 
-    iso = {}
-    with open("HFisoLarge.txt") as f:
-        for line in f:
-            if "Atom" in line:
+fc_block_count = 0
+with open(config["o"], 'r') as f:
+    for line in f:
+        if "Fermi contact (isotropic) hyperfine coupling parameter" in line:
+            fc_block_count += 1
+
+with open(config["o"], 'r') as f:
+    capture = False
+    current_block = 0
+    separator_seen = 0
+
+    for line in f:
+        if "Fermi contact (isotropic) hyperfine coupling parameter" in line:
+            current_block += 1
+            capture = (current_block == fc_block_count)
+            separator_seen = 0
+            continue
+
+        if capture:
+            if "-----" in line:
+                separator_seen += 1
+                if separator_seen >= 3:
+                    capture = False
                 continue
+            if separator_seen < 2:
+                continue
+
             parts = line.split()
-            if parts:
-                atom = parts[0]
-                iso[atom] = parts
+            if len(parts) < 6:
+                continue
 
-    with open("HFdipolarAll.txt") as f, open("HFmatrix.csv", "a", newline="") as csvfile:
-        writer = csv.writer(csvfile)
-        for line in f:
-            parts = line.split()
-            if not parts:
-                continue    
-            atom = parts[0]
-            if atom in iso:
-                Axx = float(parts[1])
-                Ayy = float(parts[2])
-                Azz = float(parts[3])
-                Axy = float(parts[4])
-                Axz = float(parts[5])
-                Ayz = float(parts[6])
+            if not parts[0].isdigit():
+                continue
 
-                HF_tensor = np.array([
-                    [Axx, Axy, Axz],
-                    [Axy, Ayy, Ayz],
-                    [Axz, Ayz, Azz]
-                ])
-    
-                eigvals, eigvecs = np.linalg.eigh(HF_tensor)
-                polar_coords = []
+            ion = int(parts[0])
+            A1c_map[ion] = float(parts[4])
 
-                for i in range(3):
-                    v = eigvecs[:, i]
-                    x, y, z = v
-                    r = np.linalg.norm(v)
-                    x /= r
-                    y /= r
-                    z /= r
+dipolar_count = 0
+with open(config["o"], 'r') as f:
+    for line in f:
+        if 'Dipolar hyperfine coupling parameters (MHz)' in line:
+            dipolar_count += 1
 
-                    theta = np.arccos(z)
-                    phi = np.arctan2(y, x)
+num = 0
+count3 = 0
+with open(config["o"], 'r') as f:
+    always_print = False
+    for line in f:
+        if 'Dipolar hyperfine coupling parameters (MHz)' in line:
+            num += 1
+            if num == dipolar_count:
+                with open("HFdipolarAll.txt", "w") as y:
+                    print(line, file=y, end='')
+                    line = skip_ahead(f, 4)
+                    always_print = True
 
-                    #degrees
-                    theta_deg = np.degrees(theta)
-                    phi_deg = np.degrees(phi)
-
-                    polar_coords.append((theta_deg, phi_deg))
-
-                iso_parts = iso[atom]
-                a_iso = float(iso_parts[2])
-                a_iso_corecorr = float(iso_parts[3])
-
-                writer.writerow([
-                    atom,
-                    round(Axx, 1), round(Ayy, 1), round(Azz, 1),
-                    round(Axy, 1), round(Axz, 1), round(Ayz, 1),
-                    round(eigvals[0], 1), round(polar_coords[0][0], 1), round(polar_coords[0][1], 1),
-                    round(eigvals[1], 1), round(polar_coords[1][0], 1), round(polar_coords[1][1], 1),
-                    round(eigvals[2], 1), round(polar_coords[2][0], 1), round(polar_coords[2][1], 1),
-                    round(a_iso, 1), round(a_iso_corecorr, 1)
-                ])
-    # latex table stuff:
-    df = pd.read_csv("HFmatrix.csv")
-    for col in df.columns:
-        if df[col].dtype in ["float64", "int64"]:
-            df[col] = df[col].map(lambda x: f"{x:.1f}")
-    rows = []
-    for _, row in df.iterrows():
-        atom = row["Atom"]
-        eigs = [
-            float(row["Eigenvalue1"]),
-            float(row["Eigenvalue2"]),
-            float(row["Eigenvalue3"])
-        ]
-        thetas = [
-            float(row["Theta1"]),
-            float(row["Theta2"]),
-            float(row["Theta3"])
-        ]
-        phis = [
-            float(row["Phi1"]),
-            float(row["Phi2"]),
-            float(row["Phi3"])
-        ]
-
-        Axx = float(row["Axx"])
-        Ayy = float(row["Ayy"])
-        Azz = float(row["Azz"])
-        rows.append([
-            atom,
-            "Axx",
-            f"{Axx:.1f}",
-            f"{eigs[0]:.1f}",
-            f"{thetas[0]:.1f}",
-            f"{phis[0]:.1f}"
-        ])
-        rows.append([
-            "",
-            "Ayy",
-            f"{Ayy:.1f}",
-            f"{eigs[1]:.1f}",
-            f"{thetas[1]:.1f}",
-            f"{phis[1]:.1f}"
-        ])
-        rows.append([
-            "",
-            "Azz",
-            f"{Azz:.1f}",
-            f"{eigs[2]:.1f}",
-            f"{thetas[2]:.1f}",
-            f"{phis[2]:.1f}"
-        ])
-    df2 = pd.DataFrame(rows, columns=[
-        "Nucleus",
-        "Parameter",
-        "Value",
-        "Eigenvalue",
-        "Theta",
-        "Phi"
+        if always_print:
+            with open("HFdipolarAll.txt", "a") as y:
+                print(line, file=y, end='')
+            if '-------------------------------------------------------------' in line:
+                count3 += 1
+        if count3 == 1:
+            always_print = False
+            count3 = 0
+with open("HFmatrix.csv", "w", newline="") as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow([
+        "Atom",
+        "Axx_corr", "Ayy_corr", "Azz_corr",
+        "Axy", "Axz", "Ayz",
+        "Eigenvalue1", "Theta1", "Phi1",
+        "Eigenvalue2", "Theta2", "Phi2",
+        "Eigenvalue3", "Theta3", "Phi3",
+        "aiso", "A1c"
     ])
-    latex_table2 = df2.to_latex(index=False)
+iso = {}
+with open("HFisoLarge.txt") as f:
+    for line in f:
+        if "Atom" in line:
+            continue
+        parts = line.split()
+        if parts:
+            atom = parts[0]
+            iso[atom] = parts
 
-    with open("HFtable.tex", "w") as texfile:
-        texfile.write(r"\documentclass{article}" "\n")
-        texfile.write(r"\usepackage{booktabs}" "\n")
-        texfile.write(r"\usepackage[margin=1in]{geometry}" "\n")
-        texfile.write(r"\begin{document}" "\n\n")
-        texfile.write(latex_table2)
-        texfile.write("\n" + r"\end{document}" + "\n")
+with open("HFdipolarAll.txt") as f, open("HFmatrix.csv", "a", newline="") as csvfile:
+    writer = csv.writer(csvfile)
+
+    for line in f:
+        parts = line.split()
+        if not parts or not parts[0].isdigit():
+            continue
+
+        ion = int(parts[0])
+        atom_index = ion - 1
+        element = atom_elements[atom_index]
+
+        atom = parts[0]
+        if atom in iso:
+            Axx_orig = float(parts[1])
+            Ayy_orig = float(parts[2])
+            Azz_orig = float(parts[3])
+            Axy = float(parts[4])
+            Axz = float(parts[5])
+            Ayz = float(parts[6])
+
+            a_iso = float(iso[atom][2])
+
+            A1c = A1c_map[ion]
+
+            Axx_corr = Axx_orig - A1c
+            Ayy_corr = Ayy_orig - A1c
+            Azz_corr = Azz_orig - A1c
+
+            HF_tensor = np.array([
+                [Axx_corr, Axy,      Axz],
+                [Axy,      Ayy_corr, Ayz],
+                [Axz,      Ayz,      Azz_corr]
+            ])
+
+            eigvals, eigvecs = np.linalg.eigh(HF_tensor)
+
+            polar_coords = []
+            for i in range(3):
+                v = eigvecs[:, i] / np.linalg.norm(eigvecs[:, i])
+                x, y, z = v
+                theta = np.degrees(np.arccos(z))
+                phi = np.degrees(np.arctan2(y, x))
+                polar_coords.append((theta, phi))
+
+            writer.writerow([
+                element,
+                round(Axx_corr, 1), round(Ayy_corr, 1), round(Azz_corr, 1),
+                round(Axy, 1), round(Axz, 1), round(Ayz, 1),
+                round(eigvals[0], 1), round(polar_coords[0][0], 1), round(polar_coords[0][1], 1),
+                round(eigvals[1], 1), round(polar_coords[1][0], 1), round(polar_coords[1][1], 1),
+                round(eigvals[2], 1), round(polar_coords[2][0], 1), round(polar_coords[2][1], 1),
+                round(a_iso, 1), round(A1c, 1)
+            ])
+
+os.remove("HFdipolarAll.txt")
+#latex table stuff
+df = pd.read_csv("HFmatrix.csv")
+
+for col in df.columns:
+    if df[col].dtype in ["float64", "int64"]:
+        df[col] = df[col].map(lambda x: f"{x:.1f}")
+
+rows = []
+
+for _, row in df.iterrows():
+    atom = row["Atom"]
+
+    eigs = [
+        float(row["Eigenvalue1"]),
+        float(row["Eigenvalue2"]),
+        float(row["Eigenvalue3"])
+    ]
+    thetas = [
+        float(row["Theta1"]),
+        float(row["Theta2"]),
+        float(row["Theta3"])
+    ]
+    phis = [
+        float(row["Phi1"]),
+        float(row["Phi2"]),
+        float(row["Phi3"])
+    ]
+
+    Axx = float(row["Axx_corr"])
+    Ayy = float(row["Ayy_corr"])
+    Azz = float(row["Azz_corr"])
+
+    rows.append([atom, r"$A_{xx}$", f"{Axx:.1f}", f"{eigs[0]:.1f}", f"{thetas[0]:.1f}", f"{phis[0]:.1f}"])
+    rows.append(["",   r"$A_{yy}$", f"{Ayy:.1f}", f"{eigs[1]:.1f}", f"{thetas[1]:.1f}", f"{phis[1]:.1f}"])
+    rows.append(["",   r"$A_{zz}$", f"{Azz:.1f}", f"{eigs[2]:.1f}", f"{thetas[2]:.1f}", f"{phis[2]:.1f}"])
+
+df2 = pd.DataFrame(rows, columns=["Nucleus", "Parameter", "Value", "Eigenvalue", r"$\theta$", r"$\phi$"])
+
+latex_table2 = df2.to_latex(index=False, escape=False)
+
+with open("HFtable.tex", "w") as texfile:
+    texfile.write(r"\documentclass{article}" "\n")
+    texfile.write(r"\usepackage{booktabs}" "\n")
+    texfile.write(r"\usepackage{amsmath}" "\n")
+    texfile.write(r"\usepackage[margin=1in]{geometry}" "\n")
+    texfile.write(r"\begin{document}" "\n\n")
+    texfile.write(latex_table2)
+    texfile.write("\n" + r"\end{document}" + "\n")
 
 
-    os.remove("HFdipolarAll.txt")
+####################################################
+    # latex table stuff
+   
 
+    
+    
+    #os.remove("HFdipolarAll.txt")
