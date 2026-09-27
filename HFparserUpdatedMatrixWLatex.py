@@ -462,14 +462,37 @@ for _, row in df.iterrows():
     Axx = float(row["Axx_corr"])
     Ayy = float(row["Ayy_corr"])
     Azz = float(row["Azz_corr"])
+    
+    thetaR1= np.radians(thetas[0])
+    thetaR2= np.radians(thetas[1])
+    thetaR3 =np.radians(thetas[2])
+    phiR1= np.radians(phis[0])
+    phiR2 = np.radians(phis[1])
+    phiR3 = np.radians(phis[2])
 
-    rows.append([atom, r"$A_{xx}$", f"{Axx:.1f}", f"{eigs[0]:.1f}", f"{thetas[0]:.1f}", f"{phis[0]:.1f}"])
-    rows.append(["",   r"$A_{yy}$", f"{Ayy:.1f}", f"{eigs[1]:.1f}", f"{thetas[1]:.1f}", f"{phis[1]:.1f}"])
-    rows.append(["",   r"$A_{zz}$", f"{Azz:.1f}", f"{eigs[2]:.1f}", f"{thetas[2]:.1f}", f"{phis[2]:.1f}"])
+    A_par_c = (
+    Axx * np.cos(thetaR1)**2 +
+    Ayy * np.cos(thetaR2)**2 +
+    Azz * np.cos(thetaR3)**2
+    )
 
-df2 = pd.DataFrame(rows, columns=["Nucleus", "Parameter", "Value", "Eigenvalue", r"$\theta$", r"$\phi$"])
+    A_par_a = (
+    Axx * (np.sin(thetaR1) * np.cos(phiR1))**2 +
+    Ayy * (np.sin(thetaR2) * np.cos(phiR2))**2 +
+    Azz * (np.sin(thetaR3) * np.cos(phiR3))**2
+    )
+    
+    rows.append([atom, r"$A_{1}$", f"{Axx:.1f}", f"{eigs[0]:.1f}", f"{thetas[0]:.1f}", f"{phis[0]:.1f}"])
+    rows.append(["", r"$A_{2}$", f"{Ayy:.1f}", f"{eigs[1]:.1f}", f"{thetas[1]:.1f}", f"{phis[1]:.1f}"])
+    rows.append(["", r"$A_{3}$", f"{Azz:.1f}", f"{eigs[2]:.1f}", f"{thetas[2]:.1f}", f"{phis[2]:.1f}"])
+    
+    rows.append(["", r"$A_{\parallel c}$", "", f"{A_par_c:.1f}", "", ""])
+    rows.append(["", r"$A_{\parallel a}$","", f"{A_par_a:.1f}", "", ""])
 
-latex_table2 = df2.to_latex(index=False, escape=False)
+    
+df2 = pd.DataFrame(rows, columns=["Nucleus", "Parameter", "oldValue", "Value", r"$\theta$", r"$\phi$"])
+lat_new = df2.drop('oldValue', axis=1)
+latex_table2 = lat_new.to_latex(index=False, escape=False)
 
 with open("HFtable.tex", "w") as texfile:
     texfile.write(r"\documentclass{article}" "\n")
