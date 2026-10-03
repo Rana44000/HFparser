@@ -265,7 +265,7 @@ if config['md']==0 or config['matrix']==True:
 #matrix wit h the eigenvalue stuff
 import csv
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import os
 
 element_symbols = []
@@ -374,7 +374,27 @@ with open("HFisoLarge.txt") as f:
         if parts:
             atom = parts[0]
             iso[atom] = parts
-
+#isovals={}
+#with open("HFisoLarge.txt") as f:
+#    for line in f:
+#        if "Atom" not in line:
+#            
+#            isvals = line.split()
+#            if isvals:
+#                inums = isvals[3]
+#                isovals[inums] = inums
+isovals = {}
+with open("HFisoLarge.txt") as f:
+    for line in f:
+        if "Atom" in line:
+            continue
+        fields = line.split()
+        if not fields:
+            continue
+        atom_num = fields[0] #=atom index
+        iso_val = float(fields[3])+float(fields[1]) #isotropic value
+        isovals[atom_num] = iso_val
+#with open(HFisoLarge.txt)
 with open("HFdipolarAll.txt") as f, open("HFmatrix.csv", "a", newline="") as csvfile:
     writer = csv.writer(csvfile)
 
@@ -389,9 +409,10 @@ with open("HFdipolarAll.txt") as f, open("HFmatrix.csv", "a", newline="") as csv
 
         atom = parts[0]
         if atom in iso:
-            Axx_orig = float(parts[1])
-            Ayy_orig = float(parts[2])
-            Azz_orig = float(parts[3])
+            iso_val = float(isovals[atom])
+            Axx_orig = float(parts[1])+ float(iso_val) # should add new isolarge value here from HFisoLarge.txt file 
+            Ayy_orig = float(parts[2]) + float(iso_val)
+            Azz_orig = float(parts[3]) + float(iso_val)
             Axy = float(parts[4])
             Axz = float(parts[5])
             Ayz = float(parts[6])
@@ -442,7 +463,7 @@ rows = []
 
 for _, row in df.iterrows():
     atom = row["Atom"]
-
+    
     eigs = [
         float(row["Eigenvalue1"]),
         float(row["Eigenvalue2"]),
@@ -490,9 +511,11 @@ for _, row in df.iterrows():
     rows.append(["", r"$A_{\parallel a}$","", f"{A_par_a:.1f}", "", ""])
 
     
-df2 = pd.DataFrame(rows, columns=["Nucleus", "Parameter", "oldValue", "Value", r"$\theta$", r"$\phi$"])
-lat_new = df2.drop('oldValue', axis=1)
-latex_table2 = lat_new.to_latex(index=False, escape=False)
+df2 = pd.DataFrame(rows, columns=["Nucleus", "Parameter", "Aiso (MHz)", "A (MHz)", r"$\theta$$^\circ$", r"$\phi$$^\circ$"])
+#lat_new = df2.drop('oldValue', axis=1)
+#latex_table2 = lat_new.to_latex(index=False, escape=False)
+
+latex_table2 = df2.to_latex(index=False, escape=False, column_format="rrrrrr")
 
 with open("HFtable.tex", "w") as texfile:
     texfile.write(r"\documentclass{article}" "\n")
@@ -500,6 +523,7 @@ with open("HFtable.tex", "w") as texfile:
     texfile.write(r"\usepackage{amsmath}" "\n")
     texfile.write(r"\usepackage[margin=1in]{geometry}" "\n")
     texfile.write(r"\begin{document}" "\n\n")
+    
     texfile.write(latex_table2)
     texfile.write("\n" + r"\end{document}" + "\n")
 
@@ -507,7 +531,10 @@ with open("HFtable.tex", "w") as texfile:
 ####################################################
     # latex table stuff
    
-
+# test code for gyromagnetic table for superscripts
+#with open("GyroTable.csv", 'r') as table:
+    #for line in table:
+        #maybe make it so this info is transferred into the csv then to latex instead of just latex
     
-    
+   # fix so that
     #os.remove("HFdipolarAll.txt")
