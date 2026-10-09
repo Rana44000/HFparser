@@ -17,6 +17,7 @@
 - Find all HF values and averages for a user defined atom
 - Print out dipolar matrix values and large isotropic hyperfine values as well as default HFvalues
 - Print out isotropic hyperfine values if user chooses into HFisoAll.txt and HFisoLarge.txt
+- For matrix, download GyroTable.csv to name atoms
 
 ## VASP
 The OUTCAR file is from running the VASP program.
@@ -28,6 +29,7 @@ For more information on VASP, see: https://www.vasp.at/wiki/index.php/The_VASP_M
 
 ## Input files:
 - OUTCAR
+- -GyroTable.csv
 
 ## Output files: 
 - HFvalues.txt (no core correction)
