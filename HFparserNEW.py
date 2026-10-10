@@ -462,6 +462,7 @@ for col in df.columns:
 rows = []
 
 for _, row in df.iterrows():
+    
     atom = row["Atom"]
     
     eigs = [
@@ -483,6 +484,9 @@ for _, row in df.iterrows():
     Axx = float(row["Axx_corr"])
     Ayy = float(row["Ayy_corr"])
     Azz = float(row["Azz_corr"])
+    Axz = float(row["Axz"])
+    Ayz = float(row["Ayz"])
+    Axy = float(row["Axy"])
     
     thetaR1= np.radians(thetas[0])
     thetaR2= np.radians(thetas[1])
@@ -492,30 +496,28 @@ for _, row in df.iterrows():
     phiR3 = np.radians(phis[2])
 
     A_par_c = (
-    Axx * np.cos(thetaR1)**2 +
-    Ayy * np.cos(thetaR2)**2 +
-    Azz * np.cos(thetaR3)**2
+    Axz + Ayz + Azz
     )
 
     A_par_a = (
-    Axx * (np.sin(thetaR1) * np.cos(phiR1))**2 +
-    Ayy * (np.sin(thetaR2) * np.cos(phiR2))**2 +
-    Azz * (np.sin(thetaR3) * np.cos(phiR3))**2
+    Axx+Axy+Axz
     )
+    A_isoNEW=(Axx+Ayy+Azz)/3
     
     rows.append([atom, r"$A_{1}$", f"{Axx:.1f}", f"{eigs[0]:.1f}", f"{thetas[0]:.1f}", f"{phis[0]:.1f}"])
     rows.append(["", r"$A_{2}$", f"{Ayy:.1f}", f"{eigs[1]:.1f}", f"{thetas[1]:.1f}", f"{phis[1]:.1f}"])
     rows.append(["", r"$A_{3}$", f"{Azz:.1f}", f"{eigs[2]:.1f}", f"{thetas[2]:.1f}", f"{phis[2]:.1f}"])
     
+    rows.append(["", r"$A_{iso}$", "", f"{A_isoNEW:.1f}", "", ""])
     rows.append(["", r"$A_{\parallel c}$", "", f"{A_par_c:.1f}", "", ""])
     rows.append(["", r"$A_{\parallel a}$","", f"{A_par_a:.1f}", "", ""])
 
     
-df2 = pd.DataFrame(rows, columns=["Nucleus", "Parameter", "Aiso (MHz)", "A (MHz)", r"$\theta$$^\circ$", r"$\phi$$^\circ$"])
-#lat_new = df2.drop('oldValue', axis=1)
+df2 = pd.DataFrame(rows, columns=["Nucleus", "Parameter", "oldValue", "A (MHz)", r"$\theta$$^\circ$", r"$\phi$$^\circ$"])
+lat_new = df2.drop('oldValue', axis=1)
 #latex_table2 = lat_new.to_latex(index=False, escape=False)
 
-latex_table2 = df2.to_latex(index=False, escape=False, column_format="rrrrrr")
+latex_table2 = lat_new.to_latex(index=False, escape=False, column_format="rrrrrr")
 
 with open("HFtable.tex", "w") as texfile:
     texfile.write(r"\documentclass{article}" "\n")
